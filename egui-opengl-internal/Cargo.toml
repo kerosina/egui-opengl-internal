@@ -1,6 +1,6 @@
 [package]
 name = "egui-opengl-internal"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["floob", "sy1ntexx", "unknowntrojan", "cohaereo"]
 description = "opengl backend for egui library."
