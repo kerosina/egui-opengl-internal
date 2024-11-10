@@ -1,5 +1,5 @@
 use clipboard::{windows_clipboard::WindowsClipboardContext, ClipboardProvider};
-use egui::{Event, Key, Modifiers, PointerButton, Pos2, RawInput, Rect, Vec2, Context};
+use egui::{Context, Event, Key, Modifiers, PointerButton, Pos2, RawInput, Rect, Vec2};
 use windows::Wdk::System::SystemInformation::NtQuerySystemTime;
 use windows::Win32::{
     Foundation::{HWND, RECT},
@@ -173,7 +173,7 @@ impl InputCollector {
                 }
                 InputResult::Character
             }
-            WM_MOUSEWHEEL => {
+            WM_MOUSEWHEEL | WM_MOUSEHWHEEL => {
                 self.alter_modifiers(get_mouse_modifiers(wparam));
 
                 let delta = (wparam >> 16) as i16 as f32 * 10. / WHEEL_DELTA as f32;
@@ -183,11 +183,15 @@ impl InputCollector {
                         .push(Event::Zoom(if delta > 0. { 1.5 } else { 0.5 }));
                     InputResult::Zoom
                 } else {
-                    self.events.push(Event::Scroll(Vec2::new(0., delta)));
+                    self.events.push(Event::MouseWheel {
+                        unit: egui::MouseWheelUnit::Point,
+                        delta: (Vec2::new(0., delta)),
+                        modifiers: Modifiers::NONE,
+                    });
                     InputResult::Scroll
                 }
             }
-            WM_MOUSEHWHEEL => {
+            /*WM_MOUSEHWHEEL => {
                 self.alter_modifiers(get_mouse_modifiers(wparam));
 
                 let delta = (wparam >> 16) as i16 as f32 * 10. / WHEEL_DELTA as f32;
@@ -200,7 +204,7 @@ impl InputCollector {
                     self.events.push(Event::Scroll(Vec2::new(delta, 0.)));
                     InputResult::Scroll
                 }
-            }
+            }*/ // dont see any diff
             msg @ (WM_KEYDOWN | WM_SYSKEYDOWN) => {
                 let modifiers = get_key_modifiers(msg);
                 self.modifiers = Some(modifiers);
@@ -257,6 +261,7 @@ impl InputCollector {
 
     pub fn collect_input(&mut self, ctx: &Context) -> RawInput {
         RawInput {
+            system_theme: None,
             modifiers: self.modifiers.unwrap_or_default(),
             events: std::mem::take(&mut self.events),
             screen_rect: Some(self.get_screen_rect()),
@@ -275,7 +280,10 @@ impl InputCollector {
     pub fn get_system_time() -> f64 {
         let mut time = 0;
         unsafe {
-            expect!(NtQuerySystemTime(&mut time).ok(), "Failed to get system time");
+            expect!(
+                NtQuerySystemTime(&mut time).ok(),
+                "Failed to get system time"
+            );
         }
 
         // dumb ass, read the docs. egui clearly says `in seconds`.
