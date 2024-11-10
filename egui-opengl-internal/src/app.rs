@@ -69,10 +69,6 @@ impl<T> OpenGLApp<T> {
                 panic_msg!("You must call init only once");
             }
 
-            if window.0 == -1 {
-                panic_msg!("Invalid output window descriptor");
-            }
-
             let _ = self.hwnd.set(window);
 
             // loads gl with all the opengl functions using get_proc_address which is hardcoded to look in the opengl32.dll module
