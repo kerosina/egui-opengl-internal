@@ -1,6 +1,6 @@
 [package]
 name = "egui-opengl-internal"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["floob", "sy1ntexx", "unknowntrojan", "cohaereo"]
 description = "opengl backend for egui library."
@@ -14,7 +14,7 @@ default-target = "x86_64-pc-windows-msvc"
 targets = ["i686-pc-windows-msvc", "x86_64-pc-windows-msvc"]
 
 [dependencies]
-egui = "0.26"
+egui = "0.29"
 gl = "0.14.0"
 spin = { version = "0.9", optional = true, features = ["lock_api"] }
 parking_lot = { version = "0.12", optional = true }
