@@ -3,11 +3,12 @@ use std::ffi::CString;
 use windows::{
     core::PCSTR,
     Win32::{
-                Graphics::OpenGL::wglGetProcAddress,
+        Foundation::HMODULE,
+        Graphics::OpenGL::wglGetProcAddress,
         System::{
             Console::{AllocConsole, FreeConsole},
             LibraryLoader::{FreeLibraryAndExitThread, GetModuleHandleA, GetProcAddress},
-        }, Foundation::HMODULE,
+        },
     },
 };
 
@@ -40,7 +41,7 @@ pub fn get_module(module_name: &str) -> HMODULE {
             module
         } else {
             // this also shouldn't silently error
-            HMODULE(0)
+            HMODULE(std::ptr::null_mut())
         }
     }
 }
